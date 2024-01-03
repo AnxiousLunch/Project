@@ -28,15 +28,19 @@ typedef struct {
     char phone[15];
     int age;
     char bloodGroup[5];
-    char userId[5];  // Limited to 4 digits
+    char userId[10];  // Limited to 4 digits
     char password[5];  // Limited to 4 digits
 } User;
 
 // Function to generate a unique user ID
+// Second version
 void generateUserId(User* user) {
-    // Generate a simple unique ID based on user information (for simplicity)
-    sprintf(user->userId, "%04d", user->age % 10000);
+    int randomDigit = rand() % 10;  // Generate a random digit (0-9)
+    sprintf(user->userId, "%c%c%c%c%d%04d",
+            tolower(user->name[0]), tolower(user->name[1]), tolower(user->name[2]), tolower(user->name[3]),
+            randomDigit, user->age % 10000);
 }
+
 
 // Function to handle sign-up process
 void signUp(User* user) {
@@ -141,8 +145,8 @@ int main() {
             FILE* file = fopen("user_data.txt", "r");
             if (file != NULL) {
                 fscanf(file, "%s %s %s %d %s %s %s", currentUser.name, currentUser.email, currentUser.phone,
-                       &currentUser.age, currentUser.bloodGroup, currentUser.userId, currentUser.password);
-                fclose(file);
+       &currentUser.age, currentUser.bloodGroup, currentUser.userId, currentUser.password);
+ fclose(file);
 
                 if (signIn(&currentUser)) {
                     printf("Sign In Successful!\n");
