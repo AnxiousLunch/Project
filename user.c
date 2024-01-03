@@ -3,22 +3,143 @@
 #include <string.h>
 #include <windows.h>
 
+struct Patient {
+    char name[50];
+    int age;
+    char gender[10];
+};
+
+void addPatient(struct Patient patients[], int *patientCount) {
+    struct Patient newPatient;
+    printf("Enter patient name: ");
+    scanf("%s", newPatient.name);
+    printf("Enter patient age: ");
+    scanf("%d", &newPatient.age);
+    printf("Enter patient gender: ");
+    scanf("%s", newPatient.gender);
+    FILE *file = fopen("patients.txt", "a");
+    if (file == NULL) {
+        printf("Unable to open the file\n");
+        return;
+    }
+    fprintf(file, "%s,%d,%s\n", newPatient.name, newPatient.age, newPatient.gender);
+    fclose(file);
+    printf("\nPatient added successfully!\n");
+}
+
+void displayPatients() {
+    FILE *file;
+    file = fopen("patients.txt", "r");
+
+    if (file == NULL) {
+        printf("\nCould not open file.\n");
+        return;
+    }
+
+    printf("\nPatients:\n");
+    char line[100];
+    char name[50], gender[10];
+    int age;
+
+    while (fgets(line, sizeof(line), file) != NULL) {
+        if (sscanf(line, "%49[^,],%d,%9[^\n]", name, &age, gender) == 3) {
+            printf("\n%s, Age: %d, Gender: %s\n", name, age, gender);
+        } else {
+            printf("\nInvalid line format: %s", line);
+        }
+    }
+
+    fclose(file);
+}
+
+void prescribeMedicine() {
+    char patientName[50];
+    char medicine[50];
+
+    printf("\nEnter patient name to prescribe medicine: ");
+    scanf("%s", patientName);
+
+    printf("Enter prescribed medicine: ");
+    scanf("%s", medicine);
+
+    FILE *file;
+    file = fopen("patients.txt", "r");
+
+    if (file == NULL) {
+        printf("\nCould not open file.\n");
+        return;
+    }
+
+    char newLine[256];
+    while (fgets(newLine, sizeof(newLine), file)) {
+        struct Patient patient;
+        sscanf(newLine, "%49[^,],%d,%9[^\1n]\n", patient.name, &patient.age, patient.gender);
+
+        if (strcmp(patient.name, patientName) == 0) {
+            snprintf(newLine, sizeof(newLine), "%s, %d, %s\n", patient.name, patient.age, medicine);
+            break;
+        }
+    }
+
+    fclose(file);
+
+    file = fopen("PrescribedMedicine.txt", "a");
+    if (file == NULL) {
+        printf("\nCould not open file.\n");
+        return;
+    }
+
+    fputs(newLine, file);
+    fclose(file);
+}
+
+void viewPrescriptions() {
+    FILE *file;
+    file = fopen("PrescribedMedicine.txt", "r");
+    if (file == NULL) {
+        printf("\nCould not open file.\n");
+        return;
+    }
+    printf("\nPrescriptions\n");
+    char line[100], name[50], gender[10], prescription[50];
+    int age;
+    while (fgets(line, sizeof(line), file)) {
+        line[strcspn(line, "\n")] = '\0';
+        if (sscanf(line, "%49[^,],%d,%9[^\n],%49[^,]", name, &age, gender, prescription) == 4) {
+            printf("\n%s, Age: %d, Gender: %s\n", name, age, gender);
+            printf("Prescription: %s\n", prescription);
+        } else {
+            printf("\nInvalid line format: %s", line);
+        }
+    }
+}
+
+
 // Function to display the welcome message without color formatting
 void displayWelcomeMessage() {
+	 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    // Change text color to red
+    SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE);
 	
     printf("\n");
     printf("   WELCOME TO SWIFT HEALTH SYSTEM\n\n");
+      SetConsoleTextAttribute(hConsole, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
 
 // Function to display the SHS logo using hashtags
 void displaySHSLogo() {
-    
+	 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    // Change text color to red
+    SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE);
     
     printf("                                ###################\n");
     printf("                                #                 #\n");
     printf("                                #       SHS       #\n");
     printf("                                #                 #\n");
     printf("                                ###################\n\n");
+     SetConsoleTextAttribute(hConsole, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
 
 // Structure for user information
@@ -103,23 +224,6 @@ int signIn(User* user) {
 }
 
 int main() {
-    /*
-	    CONSOLE_FONT_INFOEX fontInfo;
-    fontInfo.cbSize = sizeof(CONSOLE_FONT_INFOEX);
-    fontInfo.nFont = 0;
-    fontInfo.dwFontSize.X = 12;
-    fontInfo.dwFontSize.Y = 20;
-    fontInfo.FontFamily = FF_DONTCARE;
-    fontInfo.FontWeight = FW_NORMAL;
-    wcscpy(fontInfo.FaceName, L"Elephant");
-
-    SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &fontInfo);
-
-
-	system("COLOR F1");
-	*/
-	// Above comment to be removed at the time of testing it in other than Vs code ( bcz vs code will give run time error ) 
-	// Can be used in Dev
     // Display welcome message and logo
     
     displayWelcomeMessage();
@@ -127,6 +231,11 @@ int main() {
 
     int choice;
     User currentUser;
+
+    struct Patient patients[50];
+    int patientCount = 0;
+    int doctorCount = 0;
+    int choice1;
 
     do {
         // Sign-up or sign-in
@@ -159,12 +268,42 @@ int main() {
                     } else if (interactionChoice == 1) {
                         // Interaction as a doctor
                         // Add your code for doctor interaction here
-                        printf("Interacting as a doctor...\n");
+                        printf("\nInteracting as a doctor...\n");
                     } else if (interactionChoice == 2) {
                         // Interaction as a patient
                         // Add your code for patient interaction here
-                        printf("Interacting as a patient...\n");
-                    } else {
+                        do { 
+                        printf("\nInteracting as a patient...\n");
+                        printf("1. Add Patient\n");
+                        printf("2. Display Patients\n");
+                        printf("3. Prescribe Medicine\n");
+                        printf("4. View Prescriptions\n");
+                        printf("0. Exit\n");
+                        printf("Enter your choice: ");
+                        scanf("%d", &choice1);
+                        switch (choice1) {
+                            case 1:
+                                addPatient(patients, &patientCount);
+                                break;
+                            case 2:
+                             displayPatients(patients, patientCount);
+                             break;
+
+                            case 3:
+                                prescribeMedicine();
+                                break;
+                            case 4:
+                                viewPrescriptions();
+                                break;
+                            case 0:
+                                printf("Exiting...\n");
+                                break;
+                            default:
+                                printf("Invalid choice. Please try again.\n");
+                        }
+                    } while (choice1 != 0);
+                    }  
+                    else {
                         printf("Invalid choice. Exiting...\n");
                         break;
                     }
