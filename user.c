@@ -5,29 +5,20 @@
 
 // Function to display the welcome message without color formatting
 void displayWelcomeMessage() {
-	 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    // Change text color to red
-    SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE);
 	
     printf("\n");
     printf("   WELCOME TO SWIFT HEALTH SYSTEM\n\n");
-      SetConsoleTextAttribute(hConsole, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
 
 // Function to display the SHS logo using hashtags
 void displaySHSLogo() {
-	 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    // Change text color to red
-    SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE);
+    
     
     printf("                                ###################\n");
     printf("                                #                 #\n");
     printf("                                #       SHS       #\n");
     printf("                                #                 #\n");
     printf("                                ###################\n\n");
-     SetConsoleTextAttribute(hConsole, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
 
 // Structure for user information
@@ -112,7 +103,25 @@ int signIn(User* user) {
 }
 
 int main() {
+    /*
+	    CONSOLE_FONT_INFOEX fontInfo;
+    fontInfo.cbSize = sizeof(CONSOLE_FONT_INFOEX);
+    fontInfo.nFont = 0;
+    fontInfo.dwFontSize.X = 12;
+    fontInfo.dwFontSize.Y = 20;
+    fontInfo.FontFamily = FF_DONTCARE;
+    fontInfo.FontWeight = FW_NORMAL;
+    wcscpy(fontInfo.FaceName, L"Elephant");
+
+    SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &fontInfo);
+
+
+	system("COLOR F1");
+	*/
+	// Above comment to be removed at the time of testing it in other than Vs code ( bcz vs code will give run time error ) 
+	// Can be used in Dev
     // Display welcome message and logo
+    
     displayWelcomeMessage();
     displaySHSLogo();
 
