@@ -23,6 +23,152 @@ void quickAppointmentList();
 void saveDataToFile();
 void loadDataFromFile();
 
+//doctors functions :
+void displayDoctors() {
+    printf("\nList of Doctors:\n");
+    for (int i = 0; i < doctorCount; ++i) {
+        printf("%d. %s - %s - %s\n", i + 1, doctors[i].name, doctors[i].practiceLocation, doctors[i].treatedDisease);
+    }
+}
+
+void addDoctor() {
+    if (doctorCount < MAX_DOCTORS) {
+        printf("\nEnter Doctor's Name: ");
+        scanf("%s", doctors[doctorCount].name);
+
+        printf("Enter Practice Location (St City) : ");
+        scanf("%s", doctors[doctorCount].practiceLocation);
+
+        printf("Enter Disease Treated by the Doctor: ");
+        scanf("%s", doctors[doctorCount].treatedDisease);
+
+        printf("Enter Doctor's Phone Number: ");
+        scanf("%s", doctors[doctorCount].phone);
+
+        printf("Enter Appointments (DD MM YY HH MM) : ");
+        scanf("%s", doctors[doctorCount].appointments);
+
+        printf("Doctor added successfully.\n");
+
+        doctorCount++;
+        saveDataToFile(); // Save data to file after adding a doctor
+    } else {
+        printf("Cannot add more doctors. Database full.\n");
+    }
+}
+
+void deleteDoctor() {
+    if (doctorCount > 0) {
+        int index;
+        printf("\nEnter the index of the doctor to delete (1-%d): ", doctorCount);
+        scanf("%d", &index);
+
+        if (index >= 1 && index <= doctorCount) {
+            for (int i = index - 1; i < doctorCount - 1; ++i) {
+                doctors[i] = doctors[i + 1];
+            }
+            doctorCount--;
+
+            printf("Doctor deleted successfully.\n");
+            saveDataToFile(); // Save data to file after deleting a doctor
+        } else {
+            printf("Invalid index. Deletion failed.\n");
+        }
+    } else {
+        printf("No doctors to delete. Database empty.\n");
+    }
+}
+
+void searchDoctor() {
+    if (doctorCount > 0) {
+        char searchDisease[50];
+        int found = 0;
+
+        printf("\nEnter Disease to search for: ");
+        scanf("%s", searchDisease);
+
+        for (int i = 0; i < doctorCount; ++i) {
+            if (strcmp(doctors[i].treatedDisease, searchDisease) == 0) {
+                printf("Doctor found: %s - %s - %s\n", doctors[i].name, doctors[i].practiceLocation, doctors[i].treatedDisease);
+                found = 1;
+            }
+        }
+
+        if (!found) {
+            printf("No doctors found treating %s.\n", searchDisease);
+        }
+    } else {
+        printf("No doctors to search. Database empty.\n");
+    }
+}
+
+void sortDoctors() {
+    if (doctorCount > 1) {
+        // Simple bubble sort based on treatedDisease
+        for (int i = 0; i < doctorCount - 1; ++i) {
+            for (int j = 0; j < doctorCount - i - 1; ++j) {
+                if (strcmp(doctors[j].treatedDisease, doctors[j + 1].treatedDisease) > 0) {
+                    // Swap
+                    struct Doctor temp = doctors[j];
+                    doctors[j] = doctors[j + 1];
+                    doctors[j + 1] = temp;
+                }
+            }
+        }
+
+        printf("Doctors sorted by Disease.\n");
+        saveDataToFile(); // Save data to file after sorting doctors
+    } else {
+        printf("Not enough doctors to sort. Minimum 2 required.\n");
+    }
+}
+
+void quickAppointmentList() {
+    if (doctorCount > 0) {
+        printf("\nQuick Appointment List:\n");
+        for (int i = 0; i < doctorCount; ++i) {
+            printf("%d. %s - Appointments: %s\n", i + 1, doctors[i].name, doctors[i].appointments);
+        }
+    } else {
+        printf("No doctors for quick appointment list. Database empty.\n");
+    }
+}
+
+void saveDataToFile() {
+    FILE *file = fopen("doctors.txt", "w");
+
+    if (file == NULL) {
+        printf("Error opening file for writing.\n");
+        return;
+    }
+
+    for (int i = 0; i < doctorCount; ++i) {
+        fprintf(file, "%s,%s,%s,%s,%s\n", doctors[i].name, doctors[i].practiceLocation, doctors[i].treatedDisease, doctors[i].phone, doctors[i].appointments);
+    }
+
+    fclose(file);
+}
+
+void loadDataFromFile() {
+    FILE *file = fopen("doctors.txt", "r");
+
+    if (file == NULL) {
+        printf("No previous data found.\n");
+        return;
+    }
+
+    while (fscanf(file, "%[^,],%[^,],%[^,],%[^,],%[^\n]\n", doctors[doctorCount].name, doctors[doctorCount].practiceLocation, doctors[doctorCount].treatedDisease, doctors[doctorCount].phone, doctors[doctorCount].appointments) != EOF) {
+        doctorCount++;
+        if (doctorCount >= MAX_DOCTORS) {
+            printf("Maximum number of doctors reached. Loading stopped.\n");
+            break;
+        }
+    }
+
+    fclose(file);
+    printf("Data loaded successfully.\n");
+}
+
 struct Patient {
     char name[50];
     int age;
