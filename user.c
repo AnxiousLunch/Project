@@ -106,12 +106,6 @@ void createInvoice(int Id) {
     printf("\nThe total cost is %.2f\n", totalcost);
 }
 
-int main() {
-    int id = generateId();
-    createInvoice(id);
-    return 0;
-}
-
 void addDoctor() {
     if (doctorCount < MAX_DOCTORS) {
         printf("\nEnter Doctor's Name: ");
@@ -407,29 +401,20 @@ void viewPrescriptions() {
 
 // Function to display the welcome message without color formatting
 void displayWelcomeMessage() {
-	 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    // Change text color to red
-    SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE);
-	
     printf("\n");
     printf("   WELCOME TO SWIFT HEALTH SYSTEM\n\n");
-      SetConsoleTextAttribute(hConsole, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
 
 // Function to display the SHS logo using hashtags
 void displaySHSLogo() {
-	 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    // Change text color to red
-    SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE);
+;
     
     printf("                                ###################\n");
     printf("                                #                 #\n");
     printf("                                #       SHS       #\n");
     printf("                                #                 #\n");
     printf("                                ###################\n\n");
-     SetConsoleTextAttribute(hConsole, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+//     SetConsoleTextAttribute(hConsole, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
 
 // Structure for user information
@@ -519,6 +504,19 @@ int signIn(User* user) {
 
 int main() {
     // Display welcome message and logo
+    
+    system("COLOR F1");// Change Apha to change background color and number to change text color 
+    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_FONT_INFOEX fontInfo;
+    fontInfo.cbSize = sizeof(fontInfo);
+    fontInfo.nFont = 0;
+    fontInfo.dwFontSize.X = 12;  // Change this to change size
+    fontInfo.dwFontSize.Y = 18.5;  // Change this to change size
+    fontInfo.FontFamily = FF_DONTCARE;
+    fontInfo.FontWeight = FW_NORMAL;
+    wcscpy(fontInfo.FaceName, L"Elephant");
+    SetCurrentConsoleFontEx(console, FALSE, &fontInfo);
+    
     int id = generateID();
     displayWelcomeMessage();
     displaySHSLogo();
@@ -634,7 +632,7 @@ int main() {
                                 prescribeTest();
                                 break;
                             case 6:
-                            	createInvoice();
+                            	createInvoice(id);
                             	break;
                             case 0:
                                 printf("Exiting...\n");
