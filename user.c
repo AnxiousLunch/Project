@@ -24,6 +24,7 @@ void sortDoctors();
 void quickAppointmentList();
 void saveDataToFile();
 void loadDataFromFile();
+int generateID();
 
 //doctors functions :
 void displayDoctors() {
