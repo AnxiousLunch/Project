@@ -2,6 +2,26 @@
 #include <stdlib.h>
 #include <string.h>
 #include <windows.h>
+#define MAX_DOCTORS 100
+
+struct Doctor {
+    char name[50];
+    char practiceLocation[100];
+    char treatedDisease[50];
+    char phone[15];
+    char appointments[50];
+};
+struct Doctor doctors[100];
+int doctorCount = 0;
+// Function to display the welcome message without color formatting
+void displayDoctors();
+void addDoctor();
+void deleteDoctor();
+void searchDoctor();
+void sortDoctors();
+void quickAppointmentList();
+void saveDataToFile();
+void loadDataFromFile();
 
 struct Patient {
     char name[50];
@@ -272,6 +292,45 @@ int main() {
                     } else if (interactionChoice == 1) {
                         // Interaction as a doctor
                         // Add your code for doctor interaction here
+			    int choice;
+    do {
+        printf("1. Display Doctors\n");
+        printf("2. Add Doctor\n");
+        printf("3. Delete Doctor\n");
+        printf("4. Search Doctor\n");
+        printf("5. Sort Doctors by Disease\n");
+        printf("6. Quick Appointment List\n");
+        printf("0. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                displayDoctors();
+                break;
+            case 2:
+                addDoctor();
+                break;
+            case 3:
+                deleteDoctor();
+                break;
+            case 4:
+                searchDoctor();
+                break;
+            case 5:
+                sortDoctors();
+                break;
+            case 6:
+                quickAppointmentList();
+                break;
+            case 0:
+                saveDataToFile(); // Save data to file on program exit
+                printf("Exiting program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 0);
                         printf("\nInteracting as a doctor...\n");
                     } else if (interactionChoice == 2) {
                         // Interaction as a patient
