@@ -93,6 +93,49 @@ void prescribeMedicine() {
     fclose(file);
 }
 
+void prescribeTest() {
+    char patientName[50];
+    char test[50];
+
+    printf("\nEnter patient name to prescribe test: ");
+    scanf("%s", patientName);
+
+    printf("Enter prescribed medicine: ");
+    scanf("%s", test);
+
+    FILE *file;
+    file = fopen("patients.txt", "r");
+
+    if (file == NULL) {
+        printf("\nCould not open file.\n");
+        return;
+    }
+
+    char newLine[256];
+    while (fgets(newLine, sizeof(newLine), file)) {
+        struct Patient patient;
+        sscanf(newLine, "%49[^,],%d,%9[^\1n]\n", patient.name, &patient.age, patient.gender);
+
+        if (strcmp(patient.name, patientName) == 0) {
+            snprintf(newLine, sizeof(newLine), "%s, %d, %s\n", patient.name, patient.age, test);
+            break;
+        }
+    }
+
+    fclose(file);
+
+    file = fopen("Prescribedtest.txt", "a");
+    if (file == NULL) {
+        printf("\nCould not open file.\n");
+        return;
+    }
+
+    fputs(newLine, file);
+    fclose(file);
+}
+
+
+
 void viewPrescriptions() {
     FILE *file;
     file = fopen("PrescribedMedicine.txt", "r");
@@ -278,6 +321,7 @@ int main() {
                         printf("2. Display Patients\n");
                         printf("3. Prescribe Medicine\n");
                         printf("4. View Prescriptions\n");
+                        printf("5. Prescribe Test\n");
                         printf("0. Exit\n");
                         printf("Enter your choice: ");
                         scanf("%d", &choice1);
@@ -294,6 +338,9 @@ int main() {
                                 break;
                             case 4:
                                 viewPrescriptions();
+                                break;
+                            case 5:
+                                prescribeTest();
                                 break;
                             case 0:
                                 printf("Exiting...\n");
