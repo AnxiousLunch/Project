@@ -619,7 +619,7 @@ int main() {
                                 addPatient(patients, &patientCount);
                                 break;
                             case 2:
-                             displayPatients(patients, patientCount);
+                             displayPatients();
                              break;
 
                             case 3:
