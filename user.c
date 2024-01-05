@@ -4,6 +4,8 @@
 #include <windows.h>
 #define MAX_DOCTORS 100
 
+
+
 struct Doctor {
     char name[50];
     char practiceLocation[100];
@@ -29,6 +31,84 @@ void displayDoctors() {
     for (int i = 0; i < doctorCount; ++i) {
         printf("%d. %s - %s - %s\n", i + 1, doctors[i].name, doctors[i].practiceLocation, doctors[i].treatedDisease);
     }
+}
+
+int unique_id = 0;
+
+int generateID() {
+	return unique_id++;
+}
+
+
+void createInvoice(int Id) {
+    char patientName[50];
+    char patientName1[50], patientName2[50];
+    int age, age2, price1;
+    float totalcost = 0;
+    char medicineName[50], medicineName1[50], testName[50], testName1[50];
+
+    printf("Enter patient name: ");
+    scanf("%s", patientName);
+
+    // Process prescribed tests
+    FILE* test = fopen("Prescribedtest.txt", "r");
+    if (test == NULL) {
+        printf("Could not open file: Prescribedtest.txt\n");
+        return;
+    } else {
+        while (fscanf(test, " %49[^,], %d, %49[^,]", patientName2, &age2, testName) != EOF) {
+            if (strcmp(patientName, patientName2) == 0) {
+                FILE* test1 = fopen("test.txt", "r");
+                if (test1 == NULL) {
+                    printf("Could not open file: test.txt\n");
+                    fclose(test);
+                    return;
+                } else {
+                    while (fscanf(test1, " %49[^,], %d", testName1, &price1) != EOF) {
+                        if (strcmp(testName, testName1) == 0) {
+                            totalcost += price1;
+                        }
+                    }
+                    fclose(test1);
+                }
+            }
+        }
+        fclose(test);
+    }
+
+    // Process prescribed medicines
+    FILE* medicine = fopen("PrescribedMedicine.txt", "r");
+    FILE* medicine1 = fopen("medicine.txt", "r");
+    if (medicine == NULL) {
+        printf("Could not open file: PrescribedMedicine.txt\n");
+        return;
+    } else {
+        while (fscanf(medicine, " %49[^,], %d, %49[^,]", patientName1, &age, medicineName) != EOF) {
+            if (strcmp(patientName, patientName1) == 0) {
+                if (medicine1 == NULL) {
+                    printf("Could not open file: medicine.txt\n");
+                    fclose(medicine);
+                    return;
+                } else {
+                    while (fscanf(medicine1, " %49[^,], %d", medicineName1, &price1) != EOF) {
+                        if (strcmp(medicineName, medicineName1) == 0) {
+                            totalcost += price1;
+                        }
+                    }
+                    fclose(medicine1);
+                }
+            }
+        }
+        fclose(medicine);
+    }
+
+    printf("\nThe total cost is %.2f\n", totalcost);
+}
+
+int main() {
+    int id = generateId();
+    createInvoice(id);
+    return 0;
 }
 
 void addDoctor() {
@@ -438,7 +518,7 @@ int signIn(User* user) {
 
 int main() {
     // Display welcome message and logo
-    
+    int id = generateID();
     displayWelcomeMessage();
     displaySHSLogo();
 
@@ -531,6 +611,7 @@ int main() {
                         printf("3. Prescribe Medicine\n");
                         printf("4. View Prescriptions\n");
                         printf("5. Prescribe Test\n");
+                        printf("6. Generate Invoice\n");
                         printf("0. Exit\n");
                         printf("Enter your choice: ");
                         scanf("%d", &choice1);
@@ -551,6 +632,9 @@ int main() {
                             case 5:
                                 prescribeTest();
                                 break;
+                            case 6:
+                            	createInvoice();
+                            	break;
                             case 0:
                                 printf("Exiting...\n");
                                 break;
