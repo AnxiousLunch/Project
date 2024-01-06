@@ -451,8 +451,6 @@ int main() {
     fontInfo.FontWeight = FW_NORMAL;
     wcscpy(fontInfo.FaceName, L"Elephant");
     SetCurrentConsoleFontEx(console, FALSE, &fontInfo);
-    
-    int id = generateID();
     displayWelcomeMessage();
     displaySHSLogo();
 
