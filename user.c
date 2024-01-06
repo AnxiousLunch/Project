@@ -176,6 +176,7 @@ struct Patient {
     char name[50];
     int age;
     char gender[10];
+    char diagnosis[50];
 };
 
 void addPatient(struct Patient patients[], int *patientCount) {
@@ -186,12 +187,14 @@ void addPatient(struct Patient patients[], int *patientCount) {
     scanf("%d", &newPatient.age);
     printf("Enter patient gender: ");
     scanf("%s", newPatient.gender);
+    printf("Enter diagnosis: ");
+    scanf("%s", newPatient.diagnosis);
     FILE *file = fopen("patients.txt", "a");
     if (file == NULL) {
         printf("Unable to open the file\n");
         return;
     }
-    fprintf(file, "%s,%d,%s\n", newPatient.name, newPatient.age, newPatient.gender);
+    fprintf(file, "%s,%d,%s,%s\n", newPatient.name, newPatient.age, newPatient.gender, newPatient.diagnosis);
     fclose(file);
     printf("\nPatient added successfully!\n");
 }
@@ -207,12 +210,12 @@ void displayPatients() {
 
     printf("\nPatients:\n");
     char line[100];
-    char name[50], gender[10];
+    char name[50], gender[10], diagnosis[50];
     int age;
 
     while (fgets(line, sizeof(line), file) != NULL) {
-        if (sscanf(line, "%49[^,],%d,%9[^\n]", name, &age, gender) == 3) {
-            printf("\n%s, Age: %d, Gender: %s\n", name, age, gender);
+        if (sscanf(line, "%49[^,],%d,%9[^,],%49[^\n]", name, &age, gender, diagnosis) == 4) {
+            printf("\n%s, Age: %d, Gender: %s, Diagnosis: %s\n", name, age, gender, diagnosis);
         } else {
             printf("\nInvalid line format: %s", line);
         }
@@ -224,6 +227,7 @@ void displayPatients() {
 void prescribeMedicine() {
     char patientName[50];
     char medicine[50];
+    char diagnosis[50];
 
     printf("\nEnter patient name: ");
     scanf("%s", patientName);
@@ -242,7 +246,7 @@ void prescribeMedicine() {
     char newLine[256];
     while (fgets(newLine, sizeof(newLine), file)) {
         struct Patient patient;
-        sscanf(newLine, "%49[^,],%d,%9[^\1n]\n", patient.name, &patient.age, patient.gender);
+        sscanf(newLine, "%49[^,],%d,%9[^,],%49[^\n]\n", patient.name, &patient.age, patient.gender, diagnosis);
 
         if (strcmp(patient.name, patientName) == 0) {
             snprintf(newLine, sizeof(newLine), "%s, %d, %s\n", patient.name, patient.age, medicine);
@@ -265,6 +269,7 @@ void prescribeMedicine() {
 void prescribeTest() {
     char patientName[50];
     char test[50];
+    char diagnosis[50];
 
     printf("\nEnter patient name: ");
     scanf("%s", patientName);
@@ -283,7 +288,7 @@ void prescribeTest() {
     char newLine[256];
     while (fgets(newLine, sizeof(newLine), file)) {
         struct Patient patient;
-        sscanf(newLine, "%49[^,],%d,%9[^\1n]\n", patient.name, &patient.age, patient.gender);
+        sscanf(newLine, "%49[^,],%d,%9[^,],%49[^\n]\n", patient.name, &patient.age, patient.gender, diagnosis);
 
         if (strcmp(patient.name, patientName) == 0) {
             snprintf(newLine, sizeof(newLine), "%s, %d, %s\n", patient.name, patient.age, test);
@@ -317,7 +322,7 @@ void viewPrescriptions() {
     int age;
     while (fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = '\0';
-        if (sscanf(line, "%49[^,],%d,%49[^\n],%49", name, &age, prescription) == 3) {
+        if (sscanf(line, "%49[^,],%d,%49[^,]", name, &age, prescription) == 3) {
             printf("\n%s, Age: %d, Gender: %s\n", name, age, gender);
             printf("Prescription: %s\n", prescription);
         } else {
