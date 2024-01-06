@@ -399,22 +399,29 @@ void viewPrescriptions() {
 }
 
 
-// Function to display the welcome message without color formatting
 void displayWelcomeMessage() {
     printf("\n");
-    printf("   WELCOME TO SWIFT HEALTH SYSTEM\n\n");
+    printf("                 WELCOME TO SWIFT HEALTH SYSTEM\n");
+    printf("                 ==============================\n\n");
 }
 
 // Function to display the SHS logo using hashtags
 void displaySHSLogo() {
-;
-    
-    printf("                                ###################\n");
-    printf("                                #                 #\n");
-    printf("                                #       SHS       #\n");
-    printf("                                #                 #\n");
-    printf("                                ###################\n\n");
-//     SetConsoleTextAttribute(hConsole, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+	int p=4;
+    printf("\n");
+    printf("                              #############################\n");
+    printf("                             ###                         ###\n");
+    printf("                            ##                             ##\n");
+    printf("                           #       %c%c%c%c%c  %c   %c   %c%c%c%c%c      #\n",p,p,p,p,p,p,p,p,p,p,p,p);
+    printf("                          ##      %c       %c   %c  %c           ##\n",p,p,p,p,p,p,p);
+    printf("                         ###        %c%c%c%c  %c %c %c    %c%c%c%c      ###\n",p,p,p,p,p,p,p,p,p);
+    printf("                        ####            %c %c   %c        %c     ####\n",p,p,p,p);
+    printf("                         ###       %c%c%c%c%c  %c   %c   %c%c%c%c%c      ###\n",p,p,p,p,p,p,p,p,p);
+    printf("                          ##                                 ##\n");
+    printf("                           #    **Swift Health System**    #\n");
+    printf("                            ##                             ##\n");
+    printf("                             ###                         ###\n");
+    printf("                              #############################\n\n");
 }
 
 // Structure for user information
