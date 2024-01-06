@@ -323,7 +323,7 @@ void viewMedicine() {
     while (fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = '\0';
         if (sscanf(line, "%49[^,],%d,%49[^,]", name, &age, prescription) == 3) {
-            printf("\n%s, Age: %d, Gender: %s\n", name, age, gender);
+            printf("\n%s, Age: %d\n", name, age);
             printf("Medicine: %s\n", prescription);
         } else {
             printf("\nInvalid line format: %s", line);
@@ -344,7 +344,7 @@ void viewTest() {
     while (fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = '\0';
         if (sscanf(line, "%49[^,],%d,%49[^,]", name, &age, prescription) == 3) {
-            printf("\n%s, Age: %d, Gender: %s\n", name, age, gender);
+            printf("\n%s, Age: %d\n", name, age);
             printf("Test: %s\n", prescription);
         } else {
             printf("\nInvalid line format: %s", line);
