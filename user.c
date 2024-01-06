@@ -317,7 +317,7 @@ void viewPrescriptions() {
     int age;
     while (fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = '\0';
-        if (sscanf(line, "%49[^,],%d,%9[^\n],%49[^,]", name, &age, gender, prescription) == 4) {
+        if (sscanf(line, "%49[^,],%d,%49[^\n],%49", name, &age, prescription) == 3) {
             printf("\n%s, Age: %d, Gender: %s\n", name, age, gender);
             printf("Prescription: %s\n", prescription);
         } else {
