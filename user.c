@@ -182,13 +182,13 @@ struct Patient {
 void addPatient(struct Patient patients[], int *patientCount) {
     struct Patient newPatient;
     printf("Enter patient name: ");
-    scanf("%s", newPatient.name);
+    scanf(" %[^\n]", newPatient.name);
     printf("Enter patient age: ");
     scanf("%d", &newPatient.age);
     printf("Enter patient gender: ");
     scanf("%s", newPatient.gender);
     printf("Enter diagnosis: ");
-    scanf("%s", newPatient.diagnosis);
+    scanf(" %[^\n]", newPatient.diagnosis);
     FILE *file = fopen("patients.txt", "a");
     if (file == NULL) {
         printf("Unable to open the file\n");
@@ -215,7 +215,7 @@ void displayPatients() {
 
     while (fgets(line, sizeof(line), file) != NULL) {
         if (sscanf(line, "%49[^,],%d,%9[^,],%49[^\n]", name, &age, gender, diagnosis) == 4) {
-            printf("\n%s, Age: %d, Gender: %s, Diagnosis: %s\n", name, age, gender, diagnosis);
+            printf("\nName: %s, Age: %d, Gender: %s, Diagnosis: %s\n", name, age, gender, diagnosis);
         } else {
             printf("\nInvalid line format: %s", line);
         }
@@ -310,21 +310,42 @@ void prescribeTest() {
 
 
 
-void viewPrescriptions() {
+void viewMedicine() {
     FILE *file;
     file = fopen("PrescribedMedicine.txt", "r");
     if (file == NULL) {
         printf("\nCould not open file.\n");
         return;
     }
-    printf("\nPrescriptions\n");
+    printf("\nPrescribed Medicine: \n");
     char line[100], name[50], gender[10], prescription[50];
     int age;
     while (fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = '\0';
         if (sscanf(line, "%49[^,],%d,%49[^,]", name, &age, prescription) == 3) {
             printf("\n%s, Age: %d, Gender: %s\n", name, age, gender);
-            printf("Prescription: %s\n", prescription);
+            printf("Medicine: %s\n", prescription);
+        } else {
+            printf("\nInvalid line format: %s", line);
+        }
+    }
+}
+
+void viewTest() {
+    FILE *file;
+    file = fopen("PrescribedTest.txt", "r");
+    if (file == NULL) {
+        printf("\nCould not open file.\n");
+        return;
+    }
+    printf("\nPrescribed Tests:\n");
+    char line[100], name[50], gender[10], prescription[50];
+    int age;
+    while (fgets(line, sizeof(line), file)) {
+        line[strcspn(line, "\n")] = '\0';
+        if (sscanf(line, "%49[^,],%d,%49[^,]", name, &age, prescription) == 3) {
+            printf("\n%s, Age: %d, Gender: %s\n", name, age, gender);
+            printf("Test: %s\n", prescription);
         } else {
             printf("\nInvalid line format: %s", line);
         }
@@ -379,12 +400,57 @@ void generateUserId(User* user) {
 
 
 // Function to handle sign-up process
+
+int isValidEmail(const char* email) {
+    // Simple email validation, you can use a more complex one if needed
+    return (strstr(email, "@") != NULL && strstr(email, ".") != NULL);
+}
+
+int isValidPhoneNumber(const char* phone) {
+    // Simple phone number validation, checks if it contains only digits
+    for (int i = 0; i < strlen(phone); i++) {
+        if (!isdigit(phone[i])) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int isValidName(const char* name) {
+    // Name validation, checks if it contains only alphabetical characters and spaces
+    for (int i = 0; i < strlen(name); i++) {
+        if (!isalpha(name[i]) && !isspace(name[i])) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int isValidBloodGroup(const char* bloodGroup) {
+    // Blood group validation, checks if it follows the format 'X+' or 'X-'
+    if (strlen(bloodGroup) != 2 || !isalpha(bloodGroup[0]) || (bloodGroup[1] != '+' && bloodGroup[1] != '-')) {
+        return 0;
+    }
+    return 1;
+}
+
 void signUp(User* user) {
     printf("Enter your name: ");
-    scanf("%s", user->name);
+    do {
+        scanf("%s", user->name);
+        if (!isValidName(user->name)) {
+            printf("Invalid name. Please enter a valid name containing only alphabetical characters and spaces.\n");
+        }
+    } while (!isValidName(user->name));
 
-    printf("Enter your email: ");
-    scanf("%s", user->email);
+    // Validate and ask for a valid email
+    do {
+        printf("Enter your email: ");
+        scanf("%s", user->email);
+        if (!isValidEmail(user->email)) {
+            printf("Invalid email. Please enter a valid email address.\n");
+        }
+    } while (!isValidEmail(user->email));
 
     // Validate and ask for a valid 10-digit phone number
     do {
@@ -395,16 +461,28 @@ void signUp(User* user) {
             memmove(user->phone + 1, user->phone, strlen(user->phone) + 1);
             user->phone[0] = '0';
         }
-        if (strlen(user->phone) != 10) {
+        if (!isValidPhoneNumber(user->phone)) {
             printf("Invalid phone number. Please enter a 10-digit number.\n");
         }
-    } while (strlen(user->phone) != 10);
+    } while (!isValidPhoneNumber(user->phone));
 
-    printf("Enter your age: ");
-    scanf("%d", &user->age);
+    // Validate and ask for a valid age
+    do {
+        printf("Enter your age: ");
+        if (scanf("%d", &user->age) != 1 || user->age < 1 || user->age > 150) {
+            printf("Invalid age. Please enter a valid age between 1 and 150.\n");
+            while (getchar() != '\n');  // Clear the input buffer
+        }
+    } while (user->age < 1 || user->age > 150);
 
-    printf("Enter your blood group: ");
-    scanf("%s", user->bloodGroup);
+    // Validate and ask for a valid blood group
+    do {
+        printf("Enter your blood group: ");
+        scanf("%s", user->bloodGroup);
+        if (!isValidBloodGroup(user->bloodGroup)) {
+            printf("Invalid blood group. Please enter a valid blood group in the format 'X+' or 'X-'.\n");
+        }
+    } while (!isValidBloodGroup(user->bloodGroup));
 
     // Generate a unique user ID
     generateUserId(user);
@@ -426,7 +504,6 @@ void signUp(User* user) {
         printf("Error: Unable to store user information.\n");
     }
 }
-
 // Function to handle sign-in process
 int signIn(User* user) {
     char enteredUserId[5];  // Limited to 4 digits
@@ -548,6 +625,7 @@ int main() {
                         printf("3. Prescribe Medicine\n");
                         printf("4. View Prescriptions\n");
                         printf("5. Prescribe Test\n");
+                        printf("6. View Test\n");
                         printf("0. Exit\n");
                         printf("Enter your choice: ");
                         scanf("%d", &choice1);
@@ -563,11 +641,14 @@ int main() {
                                 prescribeMedicine();
                                 break;
                             case 4:
-                                viewPrescriptions();
+                                viewMedicine();
                                 break;
                             case 5:
                                 prescribeTest();
                                 break;
+                            case 6:
+                            	viewTest();
+                            	break;
                             case 0:
                                 printf("Exiting...\n");
                                 break;
