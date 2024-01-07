@@ -1,1 +1,2 @@
-Umer,19,Male
+80001,Umer,19,Male,Alopecia
+40004,Amir,10,Male,Appendix
