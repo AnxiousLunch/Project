@@ -4,8 +4,7 @@
 #include <windows.h>
 #define MAX_DOCTORS 100
 
-
-
+//Structures declared here
 struct Appointment {
     char doctorName[10];
     char patientName[10];
@@ -22,9 +21,32 @@ struct Doctor {
     char phone[15];
     char appointments[100];
 };
+
+struct Patient {
+	char id[6];
+    char name[50];
+    int age;
+    char gender[10];
+    char diagnosis[50];
+};
+
+// Structure for user information
+typedef struct {
+    char name[50];
+    char email[50];
+    char phone[15];
+    int age;
+    char bloodGroup[5];
+    char userId[10];
+    char password[5];
+} User;
+
 struct Doctor doctors[100];
+
+//Global Variables here: 
 int doctorCount = 0;
-// Function to display the welcome message without color formatting
+
+//Doctor functions declartion:
 void displayDoctors();
 void addDoctor();
 void searchDoctor();
@@ -32,10 +54,8 @@ void displayAppointments();
 void saveDataToFile();
 void createAppointment(struct Appointment *appointment);
 void loadDataFromFile();
-// Function to display the welcome message without color formatting
-int generateID();
 
-//doctors functions :
+//Doctors functions details :
 void createAppointment(struct Appointment *appointment) {
 	printf("Creating Doctor Appointment\n");
 	printf("Enter Doctor Name : ");
@@ -128,10 +148,10 @@ void addDoctor() {
         scanf("%s", doctors[doctorCount].id);
         
         printf("Enter Doctor's Name: ");
-        scanf("%s", doctors[doctorCount].name);
+        scanf(" %[^\n]", doctors[doctorCount].name);
         
         printf("Enter Doctor's Specialization : ");
-        scanf("%s", doctors[doctorCount].specialization);
+        scanf(" %[^\n]", doctors[doctorCount].specialization);
 
         printf("Enter Doctor's Phone Number: ");
         scanf("%s", doctors[doctorCount].phone);
@@ -154,28 +174,6 @@ void addDoctor() {
         saveDataToFile(); // Save data to file after adding a doctor
     } else {
         printf("Cannot add more doctors. Database full.\n");
-    }
-}
-
-void deleteDoctor() {
-    if (doctorCount > 0) {
-        int index;
-        printf("\nEnter the index of the doctor to delete (1-%d): ", doctorCount);
-        scanf("%d", &index);
-
-        if (index >= 1 && index <= doctorCount) {
-            for (int i = index - 1; i < doctorCount - 1; ++i) {
-                doctors[i] = doctors[i + 1];
-            }
-            doctorCount--;
-
-            printf("Doctor deleted successfully.\n");
-            saveDataToFile(); // Save data to file after deleting a doctor
-        } else {
-            printf("Invalid index. Deletion failed.\n");
-        }
-    } else {
-        printf("No doctors to delete. Database empty.\n");
     }
 }
 
@@ -203,7 +201,7 @@ void searchDoctor() {
 }
 
 void saveDataToFile() {
-    FILE *file = fopen("doctors.txt", "w");
+    FILE *file = fopen("doctors.txt", "a");
 
     if (file == NULL) {
         printf("Error opening file for writing.\n");
@@ -217,38 +215,11 @@ void saveDataToFile() {
     fclose(file);
 }
 
-void loadDataFromFile() {
-    FILE *file = fopen("doctors.txt", "r");
-
-    if (file == NULL) {
-        printf("No previous data found.\n");
-        return;
-    }
-
-    while (fscanf(file, "%[^,],%[^,],%[^,],%[^,],%[^\n]\n", doctors[doctorCount].name, 
-	doctors[doctorCount].practiceLocation, doctors[doctorCount].specialization, doctors[doctorCount].phone, 
-	doctors[doctorCount].appointments) != EOF) {
-        doctorCount++;
-        if (doctorCount >= MAX_DOCTORS) {
-            printf("Maximum number of doctors reached. Loading stopped.\n");
-            break;
-        }
-    }
-
-    fclose(file);
-    printf("Data loaded successfully.\n");
-}
-
-
-struct Patient {
-    char name[50];
-    int age;
-    char gender[10];
-    char diagnosis[50];
-};
-
+//Patient functions details
 void addPatient(struct Patient patients[], int *patientCount) {
     struct Patient newPatient;
+    printf("\nEnter patient id (5-digits): ");
+    scanf("%s", &newPatient.id);
     printf("Enter patient name: ");
     scanf(" %[^\n]", newPatient.name);
     printf("Enter patient age: ");
@@ -262,7 +233,7 @@ void addPatient(struct Patient patients[], int *patientCount) {
         printf("Unable to open the file\n");
         return;
     }
-    fprintf(file, "%s,%d,%s,%s\n", newPatient.name, newPatient.age, newPatient.gender, newPatient.diagnosis);
+    fprintf(file, "%s,%s,%d,%s,%s\n", newPatient.id, newPatient.name, newPatient.age, newPatient.gender, newPatient.diagnosis);
     fclose(file);
     printf("\nPatient added successfully!\n");
 }
@@ -277,13 +248,12 @@ void displayPatients() {
     }
 
     printf("\nPatients:\n");
-    char line[100];
-    char name[50], gender[10], diagnosis[50];
+    char line[100], name[50], gender[10], diagnosis[50], id[50];
     int age;
 
     while (fgets(line, sizeof(line), file) != NULL) {
-        if (sscanf(line, "%49[^,],%d,%9[^,],%49[^\n]", name, &age, gender, diagnosis) == 4) {
-            printf("\nName: %s, Age: %d, Gender: %s, Diagnosis: %s\n", name, age, gender, diagnosis);
+        if (sscanf(line, "%5[^,],%49[^,],%d,%9[^,],%49[^\n]\n", id, name, &age, gender, diagnosis) == 5) {
+            printf("\nPateint ID: %s, Name: %s, Age: %d, Gender: %s, Diagnosis: %s\n", id, name, age, gender, diagnosis);
         } else {
             printf("\nInvalid line format: %s", line);
         }
@@ -296,12 +266,14 @@ void prescribeMedicine() {
     char patientName[50];
     char medicine[50];
     char diagnosis[50];
+    char id[10];
 
-    printf("\nEnter patient name: ");
-    scanf("%s", patientName);
-
+	printf("Enter patient id: ");
+	scanf(" %s", id);
+    printf("Enter patient name: ");
+    scanf(" %[^\n]", patientName);
     printf("Enter prescribed medicine: ");
-    scanf("%s", medicine);
+    scanf(" %[^\n]", medicine);
 
     FILE *file;
     file = fopen("patients.txt", "r");
@@ -314,10 +286,10 @@ void prescribeMedicine() {
     char newLine[256];
     while (fgets(newLine, sizeof(newLine), file)) {
         struct Patient patient;
-        sscanf(newLine, "%49[^,],%d,%9[^,],%49[^\n]\n", patient.name, &patient.age, patient.gender, diagnosis);
+        sscanf(newLine, "%5[^,],%49[^,],%d,%9[^,],%49[^\n]\n", &patient.id, patient.name, &patient.age, patient.gender, diagnosis);
 
-        if (strcmp(patient.name, patientName) == 0) {
-            snprintf(newLine, sizeof(newLine), "%s, %d, %s\n", patient.name, patient.age, medicine);
+        if (strcmp(patient.id, id) == 0) {
+            snprintf(newLine, sizeof(newLine), "%s, %s, %d, %s\n", patient.id, patient.name, patient.age, medicine);
             break;
         }
     }
@@ -332,18 +304,21 @@ void prescribeMedicine() {
 
     fputs(newLine, file);
     fclose(file);
+    printf("\nMedicine Prescribed Successfully!\n");
 }
 
 void prescribeTest() {
     char patientName[50];
     char test[50];
     char diagnosis[50];
-
-    printf("\nEnter patient name: ");
-    scanf("%s", patientName);
-
+    char id[10];
+    
+    printf("\nEnter patient id: ");
+    scanf(" %s", id);
+    printf("Enter patient name: ");
+    scanf(" %[^\n]", patientName);
     printf("Enter test name: ");
-    scanf("%s", test);
+    scanf(" %[^\n]", test);
 
     FILE *file;
     file = fopen("patients.txt", "r");
@@ -356,10 +331,10 @@ void prescribeTest() {
     char newLine[256];
     while (fgets(newLine, sizeof(newLine), file)) {
         struct Patient patient;
-        sscanf(newLine, "%49[^,],%d,%9[^,],%49[^\n]\n", patient.name, &patient.age, patient.gender, diagnosis);
+        sscanf(newLine, "%5[^,],%49[^,],%d,%9[^,],%49[^\n]\n", patient.id, patient.name, &patient.age, patient.gender, diagnosis);
 
-        if (strcmp(patient.name, patientName) == 0) {
-            snprintf(newLine, sizeof(newLine), "%s, %d, %s\n", patient.name, patient.age, test);
+        if (strcmp(patient.id, id) == 0) {
+            snprintf(newLine, sizeof(newLine), "%s, %s, %d, %s\n", patient.id, patient.name, patient.age, test);
             break;
         }
     }
@@ -374,6 +349,7 @@ void prescribeTest() {
 
     fputs(newLine, file);
     fclose(file);
+    printf("\nTest Prescribed Successfully\n");
 }
 
 
@@ -386,13 +362,15 @@ void viewMedicine() {
         return;
     }
     printf("\nPrescribed Medicine: \n");
-    char line[100], name[50], gender[10], prescription[50];
+    char line[100], name[50], gender[10], prescription[50], id[10];
     int age;
     while (fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = '\0';
-        if (sscanf(line, "%49[^,],%d,%49[^,]", name, &age, prescription) == 3) {
-            printf("\n%s, Age: %d\n", name, age);
+        if (sscanf(line, "%5[^,],%49[^,],%d,%49[^,]", id, name, &age, prescription) == 4) {
+        	printf("\n-------------------------------\n");
+            printf("\nID: %s, Name: %s, Age: %d\n", id, name, age);
             printf("Medicine: %s\n", prescription);
+            printf("\n-------------------------------\n");
         } else {
             printf("\nInvalid line format: %s", line);
         }
@@ -407,20 +385,46 @@ void viewTest() {
         return;
     }
     printf("\nPrescribed Tests:\n");
-    char line[100], name[50], gender[10], prescription[50];
+    char line[100], name[50], gender[10], prescription[50], id[10];
     int age;
     while (fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = '\0';
-        if (sscanf(line, "%49[^,],%d,%49[^,]", name, &age, prescription) == 3) {
-            printf("\n%s, Age: %d\n", name, age);
+        if (sscanf(line, "%5[^,], %49[^,],%d,%49[^\n]", id, name, &age, prescription) == 4) {
+        	printf("\n-------------------------------\n");
+            printf("\nID: %s, Name: %s, Age: %d\n", id, name, age);
             printf("Test: %s\n", prescription);
+            printf("\n-------------------------------\n");
         } else {
             printf("\nInvalid line format: %s", line);
         }
     }
 }
 
+void searchPatients() {
+	char id[6], newLine[256], name[50], gender[10], diagnosis[50];
+	int age;
+	printf("\nEnter patient id (5-digits): ");
+	scanf(" %[^\n]", id);
+	FILE* file = fopen("patients.txt", "r");
+	if (file == NULL) {
+        printf("\nCould not open file.\n");
+        return;
+    }
+    while(fgets(newLine, sizeof(newLine), file)) {
+    	struct Patient patient;
+        sscanf(newLine, "%5[^,],%49[^,],%d,%9[^,],%49[^\n]\n", patient.id, patient.name, &patient.age, patient.gender, diagnosis);
+        printf("\n%s\n%s", id, patient.id);
+        if (strcmp(patient.id, id) == 0) {
+        	printf("\n-------------------------------\n");
+            printf("\nID: %s\nName: %s\nAge: %d\nGender: %s\nDiagnosis: %s", id, patient.name, patient.age, patient.gender, diagnosis);
+            printf("\n-------------------------------\n");
+			break;
+        }
+	}
+    
+}
 
+//UI functions
 void displayWelcomeMessage() {
     printf("\n");
     printf("                 WELCOME TO SWIFT HEALTH SYSTEM\n");
@@ -445,17 +449,6 @@ void displaySHSLogo() {
     printf("                             ###                         ###\n");
     printf("                              #############################\n\n");
 }
-
-// Structure for user information
-typedef struct {
-    char name[50];
-    char email[50];
-    char phone[15];
-    int age;
-    char bloodGroup[5];
-    char userId[10];  // Limited to 4 digits
-    char password[5];  // Limited to 4 digits
-} User;
 
 // Function to generate a unique user ID
 // Second version
@@ -644,7 +637,7 @@ int main() {
                         int choice;
 	struct Appointment doctorAppointment;
     do {
-    	printf("\nInteracting with Doctor DB..\n");
+    	printf("\nInteracting with Doctor DB...\n");
         printf("\n1. Display Doctors\n");
         printf("2. Add Doctor\n");
         printf("3. Search Doctor by Name\n");
@@ -682,13 +675,14 @@ int main() {
                         // Interaction as a patient
                         // Add your code for patient interaction here
                         do { 
-                        printf("\nInteracting as a patient...\n");
+                        printf("\nInteracting with Patient DB...\n");
                         printf("1. Add Patient\n");
                         printf("2. Display Patients\n");
                         printf("3. Prescribe Medicine\n");
-                        printf("4. View Prescriptions\n");
+                        printf("4. View Medication\n");
                         printf("5. Prescribe Test\n");
                         printf("6. View Test\n");
+                        printf("7. Search by patients ID\n");
                         printf("0. Exit\n");
                         printf("Enter your choice: ");
                         scanf("%d", &choice1);
@@ -711,6 +705,9 @@ int main() {
                                 break;
                             case 6:
                             	viewTest();
+                            	break;
+                            case 7:
+                            	searchPatients();
                             	break;
                             case 0:
                                 printf("Exiting...\n");
