@@ -6,50 +6,147 @@
 
 
 
+struct Appointment {
+    char doctorName[10];
+    char patientName[10];
+    char date[20];
+    char time[20];
+    char description[100];
+};
+
 struct Doctor {
+	char id[10];
     char name[50];
     char practiceLocation[100];
-    char treatedDisease[50];
+    char specialization[50];
     char phone[15];
-    char appointments[50];
+    char appointments[100];
 };
 struct Doctor doctors[100];
 int doctorCount = 0;
 // Function to display the welcome message without color formatting
 void displayDoctors();
 void addDoctor();
-void deleteDoctor();
 void searchDoctor();
-void sortDoctors();
-void quickAppointmentList();
+void displayAppointments();
 void saveDataToFile();
+void createAppointment(struct Appointment *appointment);
 void loadDataFromFile();
+// Function to display the welcome message without color formatting
 int generateID();
 
 //doctors functions :
+void createAppointment(struct Appointment *appointment) {
+	printf("Creating Doctor Appointment\n");
+	printf("Enter Doctor Name : ");
+    scanf("%s", appointment->doctorName);	
+	
+    printf("Enter Patient Name : ");
+    scanf("%s", appointment->patientName);
+    
+    printf("Enter date of Appointment (DD-MM-YY) : ");
+    scanf("%s", appointment->date);
+
+    printf("Enter time of Appointment(HH:MM AM/PM): ");
+    scanf("%s", appointment->time);
+
+    // Clear input buffer
+    while (getchar() != '\n');
+
+    printf("Enter appointment description: ");
+    fgets(appointment->description, sizeof(appointment->description), stdin);
+
+    // Remove the newline character if it exists
+    size_t len = strlen(appointment->description);
+    if (len > 0 && appointment->description[len - 1] == '\n') {
+        appointment->description[len - 1] = '\0';
+    }
+    //saving to appointment file
+	FILE *file = fopen("doctorAppointments.txt", "a");
+
+    if (file == NULL) {
+        printf("Error opening file for writing.\n");
+        return;
+    }
+    
+    fprintf(file, "Doctor Name : %s\n", appointment->doctorName);
+    fprintf(file, "Patient Name : %s\n", appointment->patientName);
+    fprintf(file, "Date: %s\n", appointment->date);
+    fprintf(file, "Time: %s\n", appointment->time);
+    fprintf(file, "Description: %s\n", appointment->description);
+    
+    fprintf(file, "---------------------------------\n");
+
+    fclose(file);
+
+    printf("Appointment saved successfully.\n");
+}
+
+void displayAppointments() {
+	printf("Doctor Appointment List : \n");
+    FILE *file = fopen("doctorAppointments.txt", "r");
+
+    if (file == NULL) {
+        printf("Error opening file for reading.\n");
+        return;
+    }
+
+    char ch;
+    while ((ch = fgetc(file)) != EOF) {
+        putchar(ch);
+    }
+
+    fclose(file);
+}
+
 void displayDoctors() {
-    printf("\nList of Doctors:\n");
+	printf("\nDoctor's List from File");
+    FILE *file = fopen("doctors.txt", "r");
+
+    if (file == NULL) {
+        printf("Error opening file for reading.\n");
+        return;
+    }
+
+    char ch;
+    while ((ch = fgetc(file)) != EOF) {
+        putchar(ch);
+    }
+
+    fclose(file);
+	
+    printf("\nList of Newly Added Doctors:\n");
     for (int i = 0; i < doctorCount; ++i) {
-        printf("%d. %s - %s - %s\n", i + 1, doctors[i].name, doctors[i].practiceLocation, doctors[i].treatedDisease);
+        printf("%d. %s - %s - %s\n", i + 1, doctors[i].name, doctors[i].practiceLocation, doctors[i].specialization);
     }
 }
 
 void addDoctor() {
     if (doctorCount < MAX_DOCTORS) {
-        printf("\nEnter Doctor's Name: ");
+    	
+    	printf("\nEnter Doctor Id (4 digits): ");
+        scanf("%s", doctors[doctorCount].id);
+        
+        printf("Enter Doctor's Name: ");
         scanf("%s", doctors[doctorCount].name);
-
-        printf("Enter Practice Location (St City) : ");
-        scanf("%s", doctors[doctorCount].practiceLocation);
-
-        printf("Enter Disease Treated by the Doctor: ");
-        scanf("%s", doctors[doctorCount].treatedDisease);
+        
+        printf("Enter Doctor's Specialization : ");
+        scanf("%s", doctors[doctorCount].specialization);
 
         printf("Enter Doctor's Phone Number: ");
         scanf("%s", doctors[doctorCount].phone);
-
-        printf("Enter Appointments (DD MM YY HH MM) : ");
-        scanf("%s", doctors[doctorCount].appointments);
+        
+        printf("Enter the Practice address: ");
+        // Clear input buffer
+    while (getchar() != '\n');
+    
+    fgets(doctors[doctorCount].practiceLocation, sizeof(doctors[doctorCount].practiceLocation), stdin);
+    
+    // Remove the newline character if it exists
+    size_t len = strlen(doctors[doctorCount].practiceLocation);
+    if (len > 0 && doctors[doctorCount].practiceLocation[len - 1] == '\n') {
+        doctors[doctorCount].practiceLocation[len - 1] = '\0';
+    }
 
         printf("Doctor added successfully.\n");
 
@@ -84,56 +181,24 @@ void deleteDoctor() {
 
 void searchDoctor() {
     if (doctorCount > 0) {
-        char searchDisease[50];
+        char searchName[50];
         int found = 0;
 
-        printf("\nEnter Disease to search for: ");
-        scanf("%s", searchDisease);
+        printf("\nEnter Dr. Name to search : ");
+        scanf("%s", searchName);
 
         for (int i = 0; i < doctorCount; ++i) {
-            if (strcmp(doctors[i].treatedDisease, searchDisease) == 0) {
-                printf("Doctor found: %s - %s - %s\n", doctors[i].name, doctors[i].practiceLocation, doctors[i].treatedDisease);
+            if (strcmp(doctors[i].name, searchName) == 0) {
+                printf("Doctor found: %s - %s - %s\n", doctors[i].name, doctors[i].practiceLocation, doctors[i].specialization);
                 found = 1;
             }
         }
 
         if (!found) {
-            printf("No doctors found treating %s.\n", searchDisease);
+            printf("No doctors found treating %s.\n", searchName);
         }
     } else {
         printf("No doctors to search. Database empty.\n");
-    }
-}
-
-void sortDoctors() {
-    if (doctorCount > 1) {
-        // Simple bubble sort based on treatedDisease
-        for (int i = 0; i < doctorCount - 1; ++i) {
-            for (int j = 0; j < doctorCount - i - 1; ++j) {
-                if (strcmp(doctors[j].treatedDisease, doctors[j + 1].treatedDisease) > 0) {
-                    // Swap
-                    struct Doctor temp = doctors[j];
-                    doctors[j] = doctors[j + 1];
-                    doctors[j + 1] = temp;
-                }
-            }
-        }
-
-        printf("Doctors sorted by Disease.\n");
-        saveDataToFile(); // Save data to file after sorting doctors
-    } else {
-        printf("Not enough doctors to sort. Minimum 2 required.\n");
-    }
-}
-
-void quickAppointmentList() {
-    if (doctorCount > 0) {
-        printf("\nQuick Appointment List:\n");
-        for (int i = 0; i < doctorCount; ++i) {
-            printf("%d. %s - Appointments: %s\n", i + 1, doctors[i].name, doctors[i].appointments);
-        }
-    } else {
-        printf("No doctors for quick appointment list. Database empty.\n");
     }
 }
 
@@ -146,7 +211,7 @@ void saveDataToFile() {
     }
 
     for (int i = 0; i < doctorCount; ++i) {
-        fprintf(file, "%s,%s,%s,%s,%s\n", doctors[i].name, doctors[i].practiceLocation, doctors[i].treatedDisease, doctors[i].phone, doctors[i].appointments);
+        fprintf(file, "\n\nDoctor's Id : %s\nName : %s\nPractice Address : %s\nSpecialization : %s\nDoctor Phone No. : %s\n", doctors[i].id, doctors[i].name, doctors[i].practiceLocation, doctors[i].specialization, doctors[i].phone, doctors[i].appointments);
     }
 
     fclose(file);
@@ -160,7 +225,9 @@ void loadDataFromFile() {
         return;
     }
 
-    while (fscanf(file, "%[^,],%[^,],%[^,],%[^,],%[^\n]\n", doctors[doctorCount].name, doctors[doctorCount].practiceLocation, doctors[doctorCount].treatedDisease, doctors[doctorCount].phone, doctors[doctorCount].appointments) != EOF) {
+    while (fscanf(file, "%[^,],%[^,],%[^,],%[^,],%[^\n]\n", doctors[doctorCount].name, 
+	doctors[doctorCount].practiceLocation, doctors[doctorCount].specialization, doctors[doctorCount].phone, 
+	doctors[doctorCount].appointments) != EOF) {
         doctorCount++;
         if (doctorCount >= MAX_DOCTORS) {
             printf("Maximum number of doctors reached. Loading stopped.\n");
@@ -171,6 +238,7 @@ void loadDataFromFile() {
     fclose(file);
     printf("Data loaded successfully.\n");
 }
+
 
 struct Patient {
     char name[50];
@@ -573,16 +641,15 @@ int main() {
                         printf("Exiting...\n");
                         break;
                     } else if (interactionChoice == 1) {
-                        // Interaction as a doctor
-                        // Add your code for doctor interaction here
-			    int choice;
+                        int choice;
+	struct Appointment doctorAppointment;
     do {
-        printf("1. Display Doctors\n");
+    	printf("\nInteracting with Doctor DB..\n");
+        printf("\n1. Display Doctors\n");
         printf("2. Add Doctor\n");
-        printf("3. Delete Doctor\n");
-        printf("4. Search Doctor\n");
-        printf("5. Sort Doctors by Disease\n");
-        printf("6. Quick Appointment List\n");
+        printf("3. Search Doctor by Name\n");
+        printf("4. Create Appointment\n");
+        printf("5. Display Appointments\n");
         printf("0. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
@@ -595,16 +662,13 @@ int main() {
                 addDoctor();
                 break;
             case 3:
-                deleteDoctor();
-                break;
-            case 4:
                 searchDoctor();
                 break;
-            case 5:
-                sortDoctors();
+            case 4:
+                createAppointment(&doctorAppointment);
                 break;
-            case 6:
-                quickAppointmentList();
+            case 5:
+                displayAppointments();
                 break;
             case 0:
                 saveDataToFile(); // Save data to file on program exit
@@ -614,7 +678,6 @@ int main() {
                 printf("Invalid choice. Please try again.\n");
         }
     } while (choice != 0);
-                        printf("\nInteracting as a doctor...\n");
                     } else if (interactionChoice == 2) {
                         // Interaction as a patient
                         // Add your code for patient interaction here
