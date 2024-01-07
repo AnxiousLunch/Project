@@ -1,0 +1,19 @@
+Doctor's Id : 4004
+Name : Ahmed
+Practice Address : Al-Khaleej Tower
+Specialization : Dermatologist
+Doctor Phone No. : 4567778980
+
+
+Doctor's Id : 5005
+Name : Amir
+Practice Address : Karachi
+Specialization : Psychology
+Doctor Phone No. : 0000000000
+
+
+Doctor's Id : 5005
+Name : Amir
+Practice Address : Karachi
+Specialization : Psychology
+Doctor Phone No. : 0000000000
