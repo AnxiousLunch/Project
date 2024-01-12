@@ -1,6 +1,12 @@
 # Hospital Management System (SHS)
 **The Hospital Management System (SHS) is a comprehensive software solution designed to streamline and enhance the administrative and operational processes within a healthcare facility.**
 
+## Group Members:
+- Omer Shamsi (CT - 23026)
+- Sami Shakir (CT - 23027)
+- Umer Safee (CT - 23032)
+- Shamir Abbas (CT - 23041)
+
 ## Table of Contents
 - **Features**
 
